@@ -99,3 +99,49 @@ jobs:
           UV_PUBLISH_USERNAME: ${{ secrets.UV_INDEX_SFTPYPI_USERNAME }}
           UV_PUBLISH_PASSWORD: ${{ secrets.UV_INDEX_SFTPYPI_PASSWORD }}
         run: uv publish --index SFTPyPI dist/*
+
+  # The hub's own job (hub design 3.7), kept through every setup-project re-render by
+  # [tool.devkit].release-workflow-jobs. Same guards as publish: the commit the tag pointed at
+  # when the event fired, and the release that triggered this run must still own the tag.
+  peers:
+    name: "Peers: validate peers.toml, stamp it, render a conf per peer, attach them"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.14"
+
+      - name: The tag must name the committed version
+        shell: bash
+        run: |
+          v="$(uv version --short)"
+          [ "v$v" = "$TAG" ] || { echo "tag $TAG does not match pyproject.toml version $v" >&2; exit 1; }
+
+      - name: uv sync
+        env:
+          UV_INDEX_SFTPYPI_USERNAME: ${{ secrets.UV_INDEX_SFTPYPI_USERNAME }}
+          UV_INDEX_SFTPYPI_PASSWORD: ${{ secrets.UV_INDEX_SFTPYPI_PASSWORD }}
+        run: uv sync
+
+      - name: python -m wireguard_hub.bundle "$TAG" bundle
+        run: uv run python -m wireguard_hub.bundle "$TAG" bundle && ls -l bundle
+
+      - name: The release must still be the one that triggered this run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ github.event.release.id }}
+        run: |
+          current="$(gh release view "$TAG" --json databaseId --jq .databaseId)"
+          [ "$current" = "$RELEASE_ID" ] || { echo "release $TAG is now #$current, not #$RELEASE_ID which triggered this run; not attaching" >&2; exit 1; }
+
+      - name: gh release upload the bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$TAG" bundle/* --clobber
