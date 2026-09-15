@@ -23,6 +23,11 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    environment:
+      - HEARTBEAT_SLUG=wireguard-hub
+      - ALERTS_EMAIL=info@sweetfiretobacco.com
+      - ALERTS_EMAIL_PWD=${ALERTS_EMAIL_PWD:?}
+      - ALERTS_RECIPIENTS=["jacob.ogden@sweetfiretobacco.com"]
 
 networks:
   coolify:
