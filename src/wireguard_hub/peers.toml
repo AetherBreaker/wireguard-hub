@@ -23,3 +23,8 @@ address = "10.8.0.21/32"
 name = "scheduled-report-aggregator"
 public_key = "X3KOCWL9jdgVQthNUxlGqCk6ujaMDW37xQ34w2TOeCw="
 address = "10.8.0.20/32"
+
+[[peers]]
+name = "office-db-pc"
+public_key = "ikf93PzvBWSGpfQvZrW+sa0B552/ee3LmZHA/B95Jx0="
+address = "10.8.0.10/32"
