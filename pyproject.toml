@@ -4,7 +4,7 @@
   description     = "The WireGuard hub: brings the interface up from the peer table, serves the bundle version endpoint, writes the heartbeat"
   readme          = "README.md"
   requires-python = ">=3.14"
-  dependencies    = ["devkit-container>=2.1.0"]                                                                                                 # setup-project added: "devkit-container"
+  dependencies    = ["aeth-ext>=9.0.2", "devkit-container>=2.1.0"]                                                                                                 # setup-project added: "devkit-container"
 
   [project.scripts]
     run-app-wireguard-hub = "wireguard_hub.__main__:run_app"

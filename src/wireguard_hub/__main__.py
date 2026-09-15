@@ -2,4 +2,5 @@
 
 
 def run_app() -> None:
-    raise NotImplementedError("run-app-wireguard-hub: implemented by the hub plan")
+  """Stub until Task 3 of the hub plan."""
+  raise NotImplementedError("run-app-wireguard-hub: implemented by the hub plan")
