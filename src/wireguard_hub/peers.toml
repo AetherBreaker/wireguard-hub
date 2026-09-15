@@ -13,3 +13,8 @@ persistent_keepalive = 25                      # default for every peer
 # 10.8.0.10/32, ScheduledReportAggregator 10.8.0.20/32, tunnel-probe 10.8.0.21/32, further
 # peers from .22 (section 11). Optional per-row overrides, each with the meaning of the [hub]
 # default it replaces: endpoint, allowed_ips, persistent_keepalive.
+
+[[peers]]
+name = "tunnel-probe"
+public_key = "9BfDfkWt/dG0elkLU9tfYPcdnc07TCGBeOj1gZpyHGs="
+address = "10.8.0.21/32"
