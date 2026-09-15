@@ -18,10 +18,8 @@ from pathlib import Path
 from typing import override
 
 # Third party imports
-from pydantic import SecretStr
-
-# First party imports
 from aeth_ext.monitoring.heartbeat import send_heartbeat
+from pydantic import SecretStr
 
 HOST = "0.0.0.0"
 PORT = 8000
