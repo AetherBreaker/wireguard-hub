@@ -1,0 +1,47 @@
+[project]
+  name            = "wireguard-hub"
+  version         = "0.1.0"
+  description     = "The WireGuard hub: brings the interface up from the peer table, serves the bundle version endpoint, writes the heartbeat"
+  readme          = "README.md"
+  requires-python = ">=3.14"
+  dependencies    = []
+
+  [project.scripts]
+    wireguard-hub-up      = "wireguard_hub.up:main"
+    run-app-wireguard-hub = "wireguard_hub.__main__:run_app"
+
+[dependency-groups]
+  dev = ["aeth-devkit>=15.1.0"]
+
+[build-system]
+  requires      = ["uv_build>=0.11.2,<0.12.0"]
+  build-backend = "uv_build"
+
+[tool.docker]
+  services                = ["wireguard-hub"]
+  required_persisted_dirs = ["persisted_data"]
+  supervise               = false
+  wireguard               = false
+  startup_scripts         = ["wireguard-hub-up"]
+  scrub_env               = ["WG_HUB_PRIVATE_KEY"]
+
+[tool.devkit]
+  release-workflow-jobs = ["peers"]
+
+[tool.poe]
+  include_script = [{ script = "aeth_devkit:tasks", executor = { type = "uv", frozen = true } }]
+
+[tool.uv]
+  [tool.uv.sources]
+    aeth-devkit         = [{ index = "SFTPyPI" }]
+    devkit-templates    = [{ index = "SFTPyPI" }]
+    devkit-container    = [{ index = "SFTPyPI" }]
+    devkit-claude-hooks = [{ index = "SFTPyPI" }]
+    devkit-poe-complete = [{ index = "SFTPyPI" }]
+    aeth-ext            = [{ index = "SFTPyPI" }]
+
+  [[tool.uv.index]]
+    name        = "SFTPyPI"
+    url         = "https://pypi.sweetfiretobacco.com/jacob.ogden/internal/+simple"
+    publish-url = "https://pypi.sweetfiretobacco.com/jacob.ogden/internal/"
+    explicit    = true
