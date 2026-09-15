@@ -28,6 +28,12 @@ services:
       - ALERTS_EMAIL=info@sweetfiretobacco.com
       - ALERTS_EMAIL_PWD=${ALERTS_EMAIL_PWD:?}
       - ALERTS_RECIPIENTS=["jacob.ogden@sweetfiretobacco.com"]
+      - WG_HUB_PRIVATE_KEY=${WG_HUB_PRIVATE_KEY:?}
+    # The hub's own (hub design 3.6): setup-project never removes a key it does not annotate
+    # and only appends to environment, so these survive every re-render.
+    cap_add: [NET_ADMIN]
+    sysctls: [net.ipv4.ip_forward=1]
+    ports: ["51820:51820/udp"]
 
 networks:
   coolify:

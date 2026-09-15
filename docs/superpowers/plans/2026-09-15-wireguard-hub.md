@@ -1299,7 +1299,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 **Files:**
 - Modify: `docker/compose.yaml`, `docker/Dockerfile`
 
-- [ ] **Step 1: Re-render for the `aeth-ext` environment block, then add the hub's lines**
+- [x] **Step 1: Re-render for the `aeth-ext` environment block, then add the hub's lines**
 
 Adding `aeth-ext` (Task 1) makes the compose template's `environment` block render (`HEARTBEAT_SLUG`, the `ALERTS_*` lines). Let `setup-project` write it, then add the hub's four lines by hand:
 
@@ -1334,7 +1334,7 @@ Edit `docker/Dockerfile`: inside the `final` window, between `# !window final:` 
 RUN apt-get update && apt-get install -y --no-install-recommends wireguard-tools iproute2 iptables && rm -rf /var/lib/apt/lists/*
 ```
 
-- [ ] **Step 2: Prove both survive a re-render**
+- [x] **Step 2: Prove both survive a re-render**
 
 ```bash
 uv run poe setup-project --dry-run 2>&1 | grep -B1 -A4 "docker/"
@@ -1342,7 +1342,7 @@ uv run poe setup-project --dry-run 2>&1 | grep -B1 -A4 "docker/"
 
 Expected: neither `docker/compose.yaml` nor `docker/Dockerfile` appears under "Changed:" (or the Dockerfile appears only with `kept 1 line(s) in window final` and no diff). `docker compose -f docker/compose.yaml config --quiet` exits 0 if Docker is available locally.
 
-- [ ] **Step 3: Build the image and run the startup script's checks in it (Docker available locally)**
+- [x] **Step 3: Build the image and run the startup script's checks in it (Docker available locally)**
 
 ```bash
 cd "/d/SFT Software Projects/SFT Workspace/wireguard-hub"
@@ -1352,9 +1352,11 @@ docker run --rm wireguard-hub:dev /app/.venv/bin/wireguard-hub-up; echo "exit=$?
 docker run --rm --cap-add NET_ADMIN --sysctl net.ipv4.ip_forward=1 -e WG_HUB_PRIVATE_KEY="$(docker run --rm wireguard-hub:dev wg genkey)" wireguard-hub:dev /app/.venv/bin/wireguard-hub-up; echo "exit=$?"
 ```
 
-Expected: the first run exits 1 with `WG_HUB_PRIVATE_KEY is not set`; the second exits 0 and logs `wg0 up, public key …, <n> peer(s)`. (If the image's build args or secrets differ from the rendered Dockerfile's `ARG`s, take them from the file; the build args and secret ids are the Dockerfile's, not this plan's. If the build needs the release tag to exist on GitHub, the `GIT_TAG` build arg can name the pushed branch's commit as above.)
+Expected: the first run exits 1 with `WG_HUB_PRIVATE_KEY is not set`; the second exits 0 and logs `wg0 up, public key …, <n> peer(s)`.
 
-- [ ] **Step 4: Tick, commit**
+Done 2026-09-15 in a stock `uv:python3.14-bookworm-slim` container with the tools installed and the tree mounted, not the rendered image: its `git clone` of this private repository would need a token in a build arg. Same commands, same result: exit 1 without the key; with a generated key `wg0` up at `10.8.0.1/24`, listen port 51820, `FORWARD DROP` plus the conntrack rule; the app answered `/version` with `200 text/plain; charset=utf-8` and `v0.1.0`, `404` elsewhere, and wrote the heartbeat file (mode 0644). (If the image's build args or secrets differ from the rendered Dockerfile's `ARG`s, take them from the file; the build args and secret ids are the Dockerfile's, not this plan's. If the build needs the release tag to exist on GitHub, the `GIT_TAG` build arg can name the pushed branch's commit as above.)
+
+- [x] **Step 4: Tick, commit**
 
 ```bash
 # tick Task 5 in the plan copy
