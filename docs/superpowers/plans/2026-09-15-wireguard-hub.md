@@ -1482,7 +1482,7 @@ If the owner supplies rows, add them to `src/wireguard_hub/peers.toml` on `main`
 
 Owner's answer (2026-09-15): no peers yet; the first release ships the hub section alone. Rows follow with the enrolment of the SAP peer, the test client and the database PC client.
 
-- [ ] **Step 2: Release 1.0.0 (owner's go-ahead first)**
+- [x] **Step 2: Release 1.0.0 (owner's go-ahead first)**
 
 ```bash
 cd "/d/SFT Software Projects/SFT Workspace/wireguard-hub"
@@ -1504,7 +1504,7 @@ gh release download v1.0.0 --pattern peers.toml --dir "$TMPDIR/v1" --clobber
 head -1 "$TMPDIR/v1/peers.toml"      # hub_version = "v1.0.0"
 ```
 
-- [ ] **Step 3: Pin the compose file to the release**
+- [x] **Step 3: Pin the compose file to the release**
 
 ```bash
 uv run poe docker-pin
@@ -1514,7 +1514,7 @@ grep -n "GIT_TAG\|PACKAGE_VERSION" docker/compose.yaml
 
 Expected: `GIT_TAG: v1.0.0` committed and pushed.
 
-- [ ] **Step 4: Tick, commit**
+- [x] **Step 4: Tick, commit**
 
 ```bash
 # tick Task 8 steps 1 to 3 in the plan copy
