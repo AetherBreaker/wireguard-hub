@@ -6,7 +6,7 @@ services:
       dockerfile: docker/Dockerfile
       args:
         GIT_REPO: https://github.com/AetherBreaker/wireguard-hub.git
-        GIT_TAG: v1.4.0
+        GIT_TAG: v1.5.0
     restart: no
     volumes:
       - type: bind
