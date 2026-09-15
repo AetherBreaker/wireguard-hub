@@ -229,5 +229,4 @@ __marimo__/
 persisted_data/
 
 # ---- project-specific ----
-# ---- SFT additions ----
 *.key
