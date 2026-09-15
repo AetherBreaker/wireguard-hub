@@ -32,8 +32,9 @@ jobs:
       - name: uv run pytest
         run: uv run pytest
 
-      - name: uv run ruff check, uv run ruff format --check
-        run: uv run ruff check && uv run ruff format --check
+      # The code only: AGENTS.md is devkit-rendered and ruff would reformat a code block in it.
+      - name: uv run ruff check --no-fix src tests, uv run ruff format --check src tests
+        run: uv run ruff check --no-fix src tests && uv run ruff format --check src tests
 
       - name: uv run pyright
         run: uv run pyright
