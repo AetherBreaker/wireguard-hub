@@ -1,0 +1,11 @@
+# The filter table, applied whole by wireguard-hub-up (hub design 3.3). Policy only: forwarding
+# is dropped unless a flow is listed here; replies to a permitted flow are accepted. Per-flow
+# ACCEPT lines (a spoke's /32 to the database PC's /32 on the database port) are the next
+# phase's, once the engine, port and protocol are decided. INPUT is not touched: Docker
+# publishes the UDP port and the container's default INPUT policy accepts.
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+-A FORWARD -i wg0 -o wg0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+COMMIT

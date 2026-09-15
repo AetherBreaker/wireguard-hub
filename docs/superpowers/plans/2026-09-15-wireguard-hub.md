@@ -137,7 +137,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 **Interfaces:**
 - Produces: `peers.parse(text: str) -> Table`, `peers.load(path: Path) -> Table`, `peers.default_path() -> Path`, `peers.rules_path() -> Path`, `peers.stamp(text: str, tag: str) -> str`, `peers.render_conf(table: Table, peer: Peer) -> str`, `peers.TAG_RE`, `peers.PeersError`; dataclasses `Hub`, `Peer`, `Table` (fields below). Tasks 2, 3 and 4 consume them.
 
-- [ ] **Step 1: Add `aeth-ext` and sync**
+- [x] **Step 1: Add `aeth-ext` and sync**
 
 In `pyproject.toml`, change `dependencies = ["devkit-container>=2.1.0"]` (keep the trailing `# setup-project added` comment tombi placed) to hold both:
 
@@ -156,7 +156,7 @@ uv run python -c "from aeth_ext.monitoring.heartbeat import send_heartbeat; prin
 
 Expected: `ok`. (The `[tool.uv.sources]` entry for `aeth-ext` already points at SFTPyPI.)
 
-- [ ] **Step 2: Write the package data**
+- [x] **Step 2: Write the package data**
 
 `src/wireguard_hub/peers.toml`, with the owner's hub public key (owner input 1) in place of `<HUB PUBLIC KEY>` and no peer rows until owner input 2:
 
@@ -194,7 +194,7 @@ persistent_keepalive = 25                      # default for every peer
 COMMIT
 ```
 
-- [ ] **Step 3: Write the failing tests**
+- [x] **Step 3: Write the failing tests**
 
 `tests/test_peers.py`:
 
@@ -286,7 +286,7 @@ def test_a_valid_table_parses_with_defaults_and_overrides():
     (('endpoint = "wireguard-hub:51820"', 'endpoint = "wireguard-hub:99999"'), "peers[1].endpoint"),
     (('allowed_ips = ["10.8.0.10/32"]', 'allowed_ips = ["10.8.0.10/33"]'), "peers[1].allowed_ips"),
     (("persistent_keepalive = 15", "persistent_keepalive = 65536"), "peers[1].persistent_keepalive"),
-    (("persistent_keepalive = 15\n", 'persistent_keepalive = 15\nextra = 1\n'), "peers[1].extra"),
+    (("persistent_keepalive = 15\n", "persistent_keepalive = 15\nextra = 1\n"), "peers[1].extra"),
     (("schema = 1\n", 'schema = 1\nhub_version = "1.2.3"\n'), "hub_version"),
     (("schema = 1\n", "schema = 1\nnote = 1\n"), "note"),
   ],
@@ -369,12 +369,12 @@ def test_every_address_in_rules_v4_is_a_peer_or_hub_address_and_the_policy_holds
     assert addr in known, f"{addr} is in rules.v4 but not in peers.toml"
 ```
 
-- [ ] **Step 4: Run the tests to see them fail**
+- [x] **Step 4: Run the tests to see them fail**
 
 Run: `cd "/d/SFT Software Projects/SFT Workspace/wireguard-hub" && uv run pytest tests/test_peers.py tests/test_rules.py -q`
 Expected: collection errors, `No module named 'wireguard_hub.peers'`.
 
-- [ ] **Step 5: Implement `peers.py`**
+- [x] **Step 5: Implement `peers.py`**
 
 ```python
 """The peer table `peers.toml` (hub design 3.2): loading, validation, the stamped bundle (3.7) and a peer's conf.
@@ -572,7 +572,7 @@ def _key(d: dict[str, object], field: str) -> str:
   value = _text(d, field)
   try:
     raw = base64.b64decode(value, validate=True)
-  except (binascii.Error, ValueError):
+  except binascii.Error, ValueError:
     raw = b""
   if len(value) != KEY_CHARS or len(raw) != KEY_BYTES:
     raise PeersError(f"{field}: must be a {KEY_CHARS}-character base64 string of {KEY_BYTES} bytes")
@@ -630,7 +630,9 @@ Note on the `schema` line: `data.get("schema") is not 1` is deliberate (`1 == Tr
 Run: `uv run pytest tests/test_peers.py tests/test_rules.py -q`
 Expected: all pass. `test_the_shipped_table_is_valid` needs the owner's real hub public key in `peers.toml` (owner input 1); with a placeholder it fails on `hub.public_key`, which is the stop for that input.
 
-- [ ] **Step 7: Lint, tick, commit**
+Not ticked yet: 36 of 38 pass; `test_the_shipped_table_is_valid` and the `rules.v4` cross-check wait for the owner's hub public key (owner input 1, 2026-09-15).
+
+- [x] **Step 7: Lint, tick, commit**
 
 ```bash
 cd "/d/SFT Software Projects/SFT Workspace/wireguard-hub"
@@ -1082,7 +1084,9 @@ address = "10.8.0.10/32"
 """
 
 
-def test_the_bundle_is_the_stamped_table_and_one_conf_per_peer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+def test_the_bundle_is_the_stamped_table_and_one_conf_per_peer(
+  tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+):
   src = tmp_path / "peers.toml"
   src.write_text(TABLE, encoding="utf-8")
   monkeypatch.setattr(bundle, "SOURCE", src)

@@ -1,0 +1,15 @@
+schema = 1
+
+[hub]
+name = "wireguard-hub"
+public_key = "<HUB PUBLIC KEY>"
+address = "10.8.0.1/24"                        # interface address; its network is the tunnel subnet
+listen_port = 51820
+endpoint = "tunnels.sweetfiretobacco.com:51820"
+allowed_ips = ["10.8.0.0/24"]                  # default AllowedIPs for every peer
+persistent_keepalive = 25                      # default for every peer
+
+# One [[peers]] row per enrolled spoke (hub design 3.2, 3.8). Addresses: office database PC
+# 10.8.0.10/32, ScheduledReportAggregator 10.8.0.20/32, tunnel-probe 10.8.0.21/32, further
+# peers from .22 (section 11). Optional per-row overrides, each with the meaning of the [hub]
+# default it replaces: endpoint, allowed_ips, persistent_keepalive.

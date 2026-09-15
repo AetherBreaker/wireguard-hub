@@ -2,4 +2,5 @@
 
 
 def main() -> None:
-    raise NotImplementedError("wireguard-hub-up: implemented by the hub plan")
+  """Stub until Task 2 of the hub plan."""
+  raise NotImplementedError("wireguard-hub-up: implemented by the hub plan")
