@@ -1049,7 +1049,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `peers.load`, `peers.stamp`, `peers.render_conf`, `peers.default_path` (Task 1).
 - Produces: `bundle.main(argv: list[str]) -> int`; `python -m wireguard_hub.bundle <tag> <out-dir>` writes `<out-dir>/peers.toml` and `<out-dir>/<peer name>.conf` and exits 0, or prints the validation error and exits 1.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `tests/test_bundle.py`:
 
@@ -1109,12 +1109,12 @@ def test_invalid_input_exits_1_naming_the_field(tmp_path: Path, monkeypatch: pyt
   assert bundle.main(["v1.2.3"]) == 2
 ```
 
-- [ ] **Step 2: Run it to see it fail**
+- [x] **Step 2: Run it to see it fail**
 
 Run: `uv run pytest tests/test_bundle.py -q`
 Expected: collection error, `cannot import name 'bundle'`.
 
-- [ ] **Step 3: Implement `bundle.py`**
+- [x] **Step 3: Implement `bundle.py`**
 
 ```python
 """The release job's entry (hub design 3.7): `python -m wireguard_hub.bundle <tag> <out-dir>`.
@@ -1161,12 +1161,12 @@ if __name__ == "__main__":
   sys.exit(main(sys.argv[1:]))
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `uv run pytest tests/test_bundle.py -q`
 Expected: 2 passed.
 
-- [ ] **Step 5: Append the `peers` job to `release.yml`**
+- [x] **Step 5: Append the `peers` job to `release.yml`**
 
 Append to the end of `.github/workflows/release.yml` (after the `publish` job's last step, one blank line between):
 
@@ -1229,7 +1229,7 @@ uv run poe setup-project --dry-run 2>&1 | grep -A3 "release.yml"
 
 Expected: `.github/workflows/release.yml` is either absent from "Changed:" or listed with `kept job peers` and no other detail; in both cases the file on disk still ends with the `peers` job (`grep -c "^  peers:" .github/workflows/release.yml` prints `1`).
 
-- [ ] **Step 6: Write `ci.yml`**
+- [x] **Step 6: Write `ci.yml`**
 
 `.github/workflows/ci.yml`:
 
@@ -1280,7 +1280,7 @@ jobs:
         run: uv run python -m wireguard_hub.bundle v0.0.0 bundle && ls -l bundle
 ```
 
-- [ ] **Step 7: Lint, tick, commit**
+- [x] **Step 7: Lint, tick, commit**
 
 ```bash
 uv run ruff format && uv run ruff check && uv run pyright

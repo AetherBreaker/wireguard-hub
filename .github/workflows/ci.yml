@@ -1,0 +1,44 @@
+name: "Verify: tests, the peer table validates and renders"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: "Python: pytest, ruff, pyright, peers.toml renders into a bundle"
+    runs-on: ubuntu-latest
+    env:
+      UV_INDEX_SFTPYPI_USERNAME: ${{ secrets.UV_INDEX_SFTPYPI_USERNAME }}
+      UV_INDEX_SFTPYPI_PASSWORD: ${{ secrets.UV_INDEX_SFTPYPI_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.14"
+
+      - name: uv sync
+        run: uv sync
+
+      - name: uv run pytest
+        run: uv run pytest
+
+      - name: uv run ruff check, uv run ruff format --check
+        run: uv run ruff check && uv run ruff format --check
+
+      - name: uv run pyright
+        run: uv run pyright
+
+      # The same validation the release job runs (hub design 3.7), on every push, so a broken
+      # table never reaches a release attempt.
+      - name: python -m wireguard_hub.bundle v0.0.0 bundle
+        run: uv run python -m wireguard_hub.bundle v0.0.0 bundle && ls -l bundle
