@@ -70,7 +70,6 @@ RUN groupadd --system --gid 999 nonroot \
 
 # Project additions to the final stage; setup-project renders the template around this window.
 # !window final:
-RUN apt-get update && apt-get install -y --no-install-recommends wireguard-tools iproute2 iptables && rm -rf /var/lib/apt/lists/*
 # !end final
 
 WORKDIR /app
