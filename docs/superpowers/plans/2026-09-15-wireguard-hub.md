@@ -1437,7 +1437,7 @@ uv run python -m wireguard_hub.bundle v0.0.0 "$TMPDIR/hub-bundle" && ls "$TMPDIR
 
 Expected: every command exits 0; the bundle folder holds `peers.toml` and one conf per row.
 
-- [ ] **Step 2: Push, open the PR, watch CI**
+- [x] **Step 2: Push, open the PR, watch CI**
 
 ```bash
 git push -u origin feat/hub
