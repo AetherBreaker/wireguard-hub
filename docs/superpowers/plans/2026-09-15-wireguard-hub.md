@@ -853,7 +853,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 **Interfaces:**
 - Produces: `run_app() -> None` (the console script); `serve(host: str, port: int) -> ThreadingHTTPServer` (started on a daemon thread, returned for the tests to stop); `beat() -> bool` (one heartbeat, `False` when the interface is absent); module constants `HEARTBEAT_FILE`, `INTERFACE`, `BEAT_SECS`, `PORT`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_app.py`:
 
@@ -924,12 +924,12 @@ def test_the_ping_key_and_slug_go_only_when_no_supervisor_owns_the_ping(tmp_path
   assert seen[-1]["pingkey"] is None and seen[-1]["slug"] is None and seen[-1]["ping_url"] is None
 ```
 
-- [ ] **Step 2: Run them to see them fail**
+- [x] **Step 2: Run them to see them fail**
 
 Run: `uv run pytest tests/test_app.py -q`
 Expected: FAIL, `app` has no attribute `serve`.
 
-- [ ] **Step 3: Implement `__main__.py`**
+- [x] **Step 3: Implement `__main__.py`**
 
 ```python
 """The app `run-app-wireguard-hub` (hub design 3.5): the version endpoint and the heartbeat, nothing else.
@@ -1021,12 +1021,12 @@ if __name__ == "__main__":
   run_app()
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `uv run pytest tests/test_app.py -q`
 Expected: 3 passed.
 
-- [ ] **Step 5: Lint, tick, commit**
+- [x] **Step 5: Lint, tick, commit**
 
 ```bash
 uv run ruff format && uv run ruff check && uv run pyright

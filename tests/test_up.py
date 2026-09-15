@@ -1,13 +1,17 @@
 # Standard library imports
 import base64
 import subprocess
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 # Third party imports
 import pytest
 
 # First party imports
 from wireguard_hub import up
+
+if TYPE_CHECKING:
+  # Standard library imports
+  from pathlib import Path
 
 HUB_KEY = base64.b64encode(bytes(range(32))).decode()
 KEY_A = base64.b64encode(bytes([1] * 32)).decode()
