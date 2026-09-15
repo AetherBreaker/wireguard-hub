@@ -18,3 +18,8 @@ persistent_keepalive = 25                      # default for every peer
 name = "tunnel-probe"
 public_key = "9BfDfkWt/dG0elkLU9tfYPcdnc07TCGBeOj1gZpyHGs="
 address = "10.8.0.21/32"
+
+[[peers]]
+name = "scheduled-report-aggregator"
+public_key = "X3KOCWL9jdgVQthNUxlGqCk6ujaMDW37xQ34w2TOeCw="
+address = "10.8.0.20/32"
