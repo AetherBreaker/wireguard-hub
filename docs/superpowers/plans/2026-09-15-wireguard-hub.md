@@ -657,7 +657,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `peers.load`, `peers.default_path`, `peers.rules_path` (Task 1).
 - Produces: `up.main() -> None` (the console script), module constants `IP_FORWARD: Path`, `PEERS_PATH: Path`, `RULES_PATH: Path` the tests redirect.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `tests/test_up.py`:
 
@@ -759,12 +759,12 @@ def test_failures_name_the_cause_never_the_key(host: Recorder, monkeypatch: pyte
   assert "iptables-restore" in err and "exited 3" in err and "PRIVATE" not in err
 ```
 
-- [ ] **Step 2: Run it to see it fail**
+- [x] **Step 2: Run it to see it fail**
 
 Run: `uv run pytest tests/test_up.py -q`
 Expected: FAIL, `up` has no attribute `PEERS_PATH` (the stub only has `main`).
 
-- [ ] **Step 3: Implement `up.py`**
+- [x] **Step 3: Implement `up.py`**
 
 ```python
 """The startup script `wireguard-hub-up` (hub design 3.4).
@@ -826,12 +826,12 @@ def _fail(message: str) -> None:
 
 `_fail` is 2 lines used 5 times and `_run` 5 lines used 7 times: both clear the repository's helper rule by reuse.
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `uv run pytest tests/test_up.py -q`
 Expected: 2 passed.
 
-- [ ] **Step 5: Lint, tick, commit**
+- [x] **Step 5: Lint, tick, commit**
 
 ```bash
 uv run ruff format && uv run ruff check && uv run pyright
