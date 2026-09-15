@@ -2,7 +2,7 @@ schema = 1
 
 [hub]
 name = "wireguard-hub"
-public_key = "<HUB PUBLIC KEY>"
+public_key = "2lx0gqPGr6SGfCWbV2W5CEr58kPGn4xhNV5Ab2qdBAY="
 address = "10.8.0.1/24"                        # interface address; its network is the tunnel subnet
 listen_port = 51820
 endpoint = "tunnels.sweetfiretobacco.com:51820"
