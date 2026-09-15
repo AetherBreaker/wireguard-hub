@@ -1,6 +1,6 @@
 [project]
   name            = "wireguard-hub"
-  version         = "0.1.0"
+  version         = "1.0.0"
   description     = "The WireGuard hub: brings the interface up from the peer table, serves the bundle version endpoint, writes the heartbeat"
   readme          = "README.md"
   requires-python = ">=3.14"
