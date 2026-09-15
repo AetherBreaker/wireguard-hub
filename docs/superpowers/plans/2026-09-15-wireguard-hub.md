@@ -625,12 +625,10 @@ def render_conf(table: Table, peer: Peer) -> str:
 
 Note on the `schema` line: `data.get("schema") is not 1` is deliberate (`1 == True` and `1 == 1.0` in Python; `is` against the small-int cache rejects both) but ruff flags it (F632); if the `noqa` does not silence it in this ruff version, use `type(data.get("schema")) is int and data["schema"] == 1` instead.
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 Run: `uv run pytest tests/test_peers.py tests/test_rules.py -q`
 Expected: all pass. `test_the_shipped_table_is_valid` needs the owner's real hub public key in `peers.toml` (owner input 1); with a placeholder it fails on `hub.public_key`, which is the stop for that input.
-
-Not ticked yet: 36 of 38 pass; `test_the_shipped_table_is_valid` and the `rules.v4` cross-check wait for the owner's hub public key (owner input 1, 2026-09-15).
 
 - [x] **Step 7: Lint, tick, commit**
 
@@ -1428,7 +1426,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 ### Task 7: verification, PR, CI, merge
 
-- [ ] **Step 1: The full local suite**
+- [x] **Step 1: The full local suite**
 
 ```bash
 cd "/d/SFT Software Projects/SFT Workspace/wireguard-hub"
