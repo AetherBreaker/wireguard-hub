@@ -1373,7 +1373,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 **Files:**
 - Modify: `README.md`; create `TODO.md`
 
-- [ ] **Step 1: Write the README**
+- [x] **Step 1: Write the README**
 
 Replace `README.md` with:
 
@@ -1402,7 +1402,7 @@ Take the public key from the spoke's `not enrolled` log line, add a `[[peers]]` 
 Coolify: the compose file publishes UDP 51820 directly; the domain `tunnels.sweetfiretobacco.com` is attached to the `wireguard-hub` service on container port 8000 in the Coolify UI. Environment: `WG_HUB_PRIVATE_KEY`, `PINGKEY`, `ALERTS_EMAIL_PWD`. The host needs the WireGuard kernel module and the netfilter modules `iptables-nft` uses; the first-deploy checklist is section 16 of the design.
 ```
 
-- [ ] **Step 2: Record the TODO entries of spec 15 that are the hub's**
+- [x] **Step 2: Record the TODO entries of spec 15 that are the hub's**
 
 Create `TODO.md`:
 
@@ -1414,7 +1414,7 @@ Create `TODO.md`:
 - Preshared keys in fetched mode need a per-peer secret on the hub side (hub design 15).
 ```
 
-- [ ] **Step 3: Tick, commit**
+- [x] **Step 3: Tick, commit**
 
 ```bash
 # tick Task 6 in the plan copy
