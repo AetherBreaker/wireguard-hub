@@ -1458,7 +1458,7 @@ gh pr checks --watch
 
 Expected: the one CI job green.
 
-- [ ] **Step 3: Merge (owner's call), tick, commit**
+- [x] **Step 3: Merge (owner's call), tick, commit**
 
 The owner merges on GitHub or says to. Then:
 
@@ -1476,9 +1476,11 @@ git push
 
 ### Task 8: the first release, the pin, the deployment
 
-- [ ] **Step 1: The owner's peer rows (owner input 2)**
+- [x] **Step 1: The owner's peer rows (owner input 2)**
 
 If the owner supplies rows, add them to `src/wireguard_hub/peers.toml` on `main` in the 3.2 shape, run `uv run pytest`, commit as `feat(peers): enrol <names>` and push. Otherwise the first release ships the hub section alone.
+
+Owner's answer (2026-09-15): no peers yet; the first release ships the hub section alone. Rows follow with the enrolment of the SAP peer, the test client and the database PC client.
 
 - [ ] **Step 2: Release 1.0.0 (owner's go-ahead first)**
 
