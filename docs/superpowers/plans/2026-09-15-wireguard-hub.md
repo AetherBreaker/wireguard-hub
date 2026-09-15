@@ -90,7 +90,7 @@ Implementation details under the owner's ruling; listed so the owner can veto an
 **Files:**
 - Create: the three plan copies named above.
 
-- [ ] **Step 1: Copy this plan into the three other repositories and commit each on `main`**
+- [x] **Step 1: Copy this plan into the three other repositories and commit each on `main`**
 
 ```bash
 ws="/d/SFT Software Projects/SFT Workspace"
@@ -106,7 +106,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 done
 ```
 
-- [ ] **Step 2: Branch `wireguard-hub`**
+- [x] **Step 2: Branch `wireguard-hub`**
 
 ```bash
 cd "/d/SFT Software Projects/SFT Workspace/wireguard-hub"
@@ -115,7 +115,7 @@ git checkout main && git pull --ff-only
 git checkout -b feat/hub
 ```
 
-- [ ] **Step 3: Tick Task 0 and commit the tick**
+- [x] **Step 3: Tick Task 0 and commit the tick**
 
 ```bash
 cd "/d/SFT Software Projects/SFT Workspace/wireguard-hub"
