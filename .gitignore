@@ -231,3 +231,4 @@ persisted_data/
 # ---- project-specific ----
 *.key
 /office-db-pc.conf
+/cffs-pc.conf

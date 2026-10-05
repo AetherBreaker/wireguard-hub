@@ -8,4 +8,6 @@
 :FORWARD DROP [0:0]
 :OUTPUT ACCEPT [0:0]
 -A FORWARD -i wg0 -o wg0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# camera-footage-fs (public ingress) to cffs-pc's SFTPGo: SFTP and the web client only.
+-A FORWARD -i wg0 -o wg0 -s 10.8.0.23/32 -d 10.8.0.22/32 -p tcp -m multiport --dports 2022,8090 -m conntrack --ctstate NEW -j ACCEPT
 COMMIT

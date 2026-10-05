@@ -10,8 +10,8 @@ allowed_ips = ["10.8.0.0/24"]                  # default AllowedIPs for every pe
 persistent_keepalive = 25                      # default for every peer
 
 # One [[peers]] row per enrolled spoke (hub design 3.2, 3.8). Addresses: office database PC
-# 10.8.0.10/32, ScheduledReportAggregator 10.8.0.20/32, tunnel-probe 10.8.0.21/32, further
-# peers from .22 (section 11). Optional per-row overrides, each with the meaning of the [hub]
+# 10.8.0.10/32, ScheduledReportAggregator 10.8.0.20/32, tunnel-probe 10.8.0.21/32, SFTPGo PC
+# 10.8.0.22/32, camera-footage-fs ingress 10.8.0.23/32, further peers from .24 (section 11). Optional per-row overrides, each with the meaning of the [hub]
 # default it replaces: endpoint, allowed_ips, persistent_keepalive.
 
 [[peers]]
@@ -28,3 +28,13 @@ address = "10.8.0.20/32"
 name = "office-db-pc"
 public_key = "ikf93PzvBWSGpfQvZrW+sa0B552/ee3LmZHA/B95Jx0="
 address = "10.8.0.10/32"
+
+[[peers]]
+name = "cffs-pc"
+public_key = "miiHZeTDmcHYjh9xEEPhJGSLHsxl3Vcx7X1x//SsEx0="
+address = "10.8.0.22/32"
+
+[[peers]]
+name = "camera-footage-fs"
+public_key = "9Ks4w2gApb2amCxjAatyapvIFsX6CWgLcvNA6v1+rmc="
+address = "10.8.0.23/32"
