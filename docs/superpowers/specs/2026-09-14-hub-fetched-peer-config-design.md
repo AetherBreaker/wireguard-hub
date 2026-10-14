@@ -1235,10 +1235,11 @@ and added the first per-flow line (3.3, 10.3). Both are working: `cffs-pc` runs
 wireguard-spoke-agent 0.1.1, installed by camera-footage-fs's `Install-CffsPc.ps1`, with a fresh
 handshake on 2026-10-06; camera-footage-fs 1.0.0 is deployed, reached `cffs-pc` over the tunnel on
 2026-10-06, and served SFTP publicly on 2026-10-07, which also exercised the hairpin of 16 from a
-VPS-side spoke. The office PC has not been installed; its installer is in design (10.4). No
-session records the Coolify deploys of ScheduledReportAggregator and `tunnel-probe` on their
-migrated compose files, so step 4 stays open. The same day this document was restructured
-(header) and became the only copy.
+VPS-side spoke. Coolify deploys each project from its `main` branch's HEAD, so the compose pins
+there are what runs: ScheduledReportAggregator in fetched mode at v3.1.2 since 2026-09-17, and
+`tunnel-probe` at v1.0.0, deployed by the owner and exited by design (10.1). The office PC has not
+been installed; its installer is in design (10.4). It is all that is left in step 4. The same day
+this document was restructured (header) and became the only copy.
 
 ## 15. TODO entries to record in this repo at implementation
 
