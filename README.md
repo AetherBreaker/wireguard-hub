@@ -1,13 +1,13 @@
 # wireguard-hub
 
-The WireGuard hub of the tunnel (design: `docs/superpowers/specs/2026-09-14-hub-fetched-peer-config-design.md`, section 3). One package, two programs:
+The WireGuard hub of the tunnel. `docs/superpowers/specs/2026-09-14-hub-fetched-peer-config-design.md` is the tunnel's overall design (the hub is its section 3), kept here only; each consuming project holds what is specific to it. One package, two programs:
 
 - `wireguard-hub-up`: runs once as root before the app (the entrypoint's `startup_scripts`). Validates `src/wireguard_hub/peers.toml`, brings `wg0` up from it with the private key from `WG_HUB_PRIVATE_KEY` (stdin only; scrubbed from the app's environment by `scrub_env`), applies `src/wireguard_hub/rules.v4`, logs the hub's public key and the peer count, exits.
 - `run-app-wireguard-hub`: unprivileged. `GET /version` on port 8000 answers `v<version>`; the heartbeat is written every 60 s while `/sys/class/net/wg0` exists, so a vanished interface turns the standard healthcheck unhealthy.
 
 ## The peer table
 
-`peers.toml` is the single hand-edited source: the `[hub]` section and one `[[peers]]` row per enrolled spoke (name, public key, `/32` address; optional `endpoint`, `allowed_ips`, `persistent_keepalive` overrides). Addresses: subnet `10.8.0.0/24`, hub `10.8.0.1`, office database PC `10.8.0.10`, ScheduledReportAggregator `10.8.0.20`, `tunnel-probe` `10.8.0.21`, further peers from `.22`. Every rule of the table is checked by the startup script, by `python -m wireguard_hub.bundle`, and by the tests (`uv run pytest`); a failure names the field.
+`peers.toml` is the single hand-edited source: the `[hub]` section and one `[[peers]]` row per enrolled spoke (name, public key, `/32` address; optional `endpoint`, `allowed_ips`, `persistent_keepalive` overrides). Addresses: subnet `10.8.0.0/24`, hub `10.8.0.1`, office database PC `10.8.0.10`, ScheduledReportAggregator `10.8.0.20`, `tunnel-probe` `10.8.0.21`, `cffs-pc` `10.8.0.22`, camera-footage-fs `10.8.0.23`, further peers from `.24`. Every rule of the table is checked by the startup script, by `python -m wireguard_hub.bundle`, and by the tests (`uv run pytest`); a failure names the field.
 
 ## Releases
 
@@ -15,7 +15,7 @@ The WireGuard hub of the tunnel (design: `docs/superpowers/specs/2026-09-14-hub-
 
 ## Enrolling a peer
 
-Take the public key from the spoke's `not enrolled` log line, add a `[[peers]]` row with the next address, release the hub, redeploy the spoke. A running, enrolled spoke picks up a later change to its row within its version poll interval.
+Take the public key from the spoke's `not enrolled` log line, add a `[[peers]]` row with the next address, add a `rules.v4` line for each flow it may open to another peer, release the hub, redeploy the spoke. A running, enrolled spoke picks up a later change to its row within its version poll interval. A Windows spoke logs nothing before it is installed: generate its key pair at enrolment and hand the private key to its installer (design, 3.8 and 10.2).
 
 ## Deploying
 

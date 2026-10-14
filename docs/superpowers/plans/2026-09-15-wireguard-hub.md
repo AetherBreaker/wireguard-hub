@@ -12,6 +12,9 @@
 
 ## Progress tracking (owner's instruction, 2026-09-15)
 
+Superseded 2026-10-14 (owner): this plan and its spec live only in this repository. The copies
+named below are removed and nothing is mirrored any more.
+
 - The executor ticks each step's box (`- [ ]` to `- [x]`) **as the step completes**, not at the end of the task, in the plan copy of the repository the step's commit lands in: `wireguard-hub` for every task. After every task the ticked file is mirrored over the copies in `aeth_devkit`, `devkit-templates` and `devkit-container` (an uncommitted mirror is enough between tasks; Task 9 commits the final one everywhere), so the owner reads progress from any copy.
 - Every "Lint and commit" step names the plan file in its `git add` so the ticks ship with the work.
 - A step that cannot be completed is left unticked with a one-line note under it saying why; the plan is never edited to make it pass.

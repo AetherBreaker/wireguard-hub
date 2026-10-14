@@ -3,6 +3,13 @@
 Date: 2026-09-14. Status: frozen after the grounding pass of 2026-09-14 (section 0.3). A change
 from here needs the owner's explicit decision, recorded here first (rule 5 of 0.2).
 
+Restructured 2026-10-14 (owner): this is the overall design of the tunnel and lives only in
+`wireguard-hub`. The copies once kept in every repository the plans touched (`devkit-container`,
+`aeth-devkit`, `devkit-templates`, `tunnel-probe`) are removed. What is specific to one project
+lives in that project, overlapping this document only where its scope needs it:
+ScheduledReportAggregator's `docs/office-database-access.md` holds the office database PC and the
+database flows (10.4); camera-footage-fs's README holds `cffs-pc` and the public ingress (10.3).
+
 ## 0. How this document is used
 
 ### 0.1 Scope: the whole shape, in one place
@@ -24,7 +31,10 @@ against text that has gone stale. The dependency map:
 | 8 Environment contract | this repo (README), every consumer | 5, 6, 7 |
 | 9 Templates and `[tool.docker]` | this repo (package data) | 3.6, 8, 10 |
 | 9.3 The Dockerfile windows | `aeth-devkit` (`setup-project`) | 3.6 |
-| 10 Consuming projects | ScheduledReportAggregator, `tunnel-probe`, the office PC | 4, 8, 9 |
+| 10 Consuming projects | each spoke's own repository; Windows spokes through `wireguard-spoke-agent` | 4, 8, 9 |
+
+The pieces in `aeth-devkit`, `devkit-templates` and `devkit-container` have landed (section 14);
+their READMEs document what shipped.
 
 ### 0.2 Source of truth, and the stop-and-ask rule
 
@@ -197,9 +207,18 @@ Recorded so they are not reopened.
   production code, which anyone able to set could already outdo by setting the hub URL and the
   private key); a local stand-in over TLS (the binary would have to trust the image's certificate
   store, and a stand-in encodes the same assumptions as the code it tests).
-- **The database flow rules are the next phase's.** `rules.v4` ships with the policy lines only
-  (3.3); the per-flow lines, the office PC's firewall rule and `tunnel-probe`'s query follow once
-  the engine, port and protocol are decided (section 11).
+- **The database flow rules are the next phase's.** `rules.v4` shipped with the policy lines only
+  (3.3); the database's per-flow lines, the office PC's firewall rule and `tunnel-probe`'s query
+  follow once the engine, port and protocol are decided. That decision and its flows are
+  ScheduledReportAggregator's (10.4).
+- **Windows spokes run WireGuard for Windows, kept current by `wireguard-spoke-agent`** (owner,
+  2026-10-05; settled for every Windows spoke 2026-10-14). The agent manages only the tunnel
+  service and ships no installer; each spoke's own project installs it (10.2). Rejected for the
+  office PC on 2026-09-15: Docker Desktop, a Rust Windows service as a starting point, and a Linux
+  node on the office LAN as a starting point (ScheduledReportAggregator's document, 5).
+- **A public ingress is an ordinary spoke** (owner, 2026-10-05). A spoke whose app is the proxy,
+  with its own key and its own `wg0`, does not break section 12's "no relay" rule, which is about
+  middlemen between an app and its `wg0` (10.3).
 - **Environment rendering rule.** A variable is rendered into the compose template only if at
   least one app will set it at first deployment. Everything else is documented, not rendered.
 - **Out of scope, recorded as TODO at implementation** (section 15): a per-project conf file
@@ -279,14 +298,15 @@ CIDR with a host part; `endpoint` (hub and overrides) `host:port` with `port` in
 
 ### 3.3 `rules.v4`
 
-An `iptables-restore` file for the `filter` table, applied whole by the startup script. In this
-document it holds the policy only: `FORWARD DROP`, and accept `ESTABLISHED,RELATED` on `wg0` to
-`wg0`. The per-flow `ACCEPT` lines, one per permitted flow from a spoke's `/32` to the database
-PC's `/32` on the database port and protocol, are the next phase's, once the engine, port and
-protocol are decided (section 11); the file's shape is fixed now so that phase adds lines, not
-structure. Tunnel addresses in this file duplicate `peers.toml`; that is accepted for this spec,
-and a hub test asserts every address in `rules.v4` is an address in `peers.toml` (trivially true
-while it holds none). Generating the rules from the table is a TODO (section 15). The `INPUT`
+An `iptables-restore` file for the `filter` table, applied whole by the startup script. It holds
+the policy, `FORWARD DROP` and accept `ESTABLISHED,RELATED` on `wg0` to `wg0`, then one `ACCEPT`
+line per permitted flow, from a spoke's `/32` to a destination peer's `/32` on named ports and
+protocol, `wg0` to `wg0`, state `NEW`. The first flow, in hub 1.5.1, is camera-footage-fs to
+`cffs-pc` on TCP 2022 and 8090 (10.3). The database flows are the next phase's (10.4); the
+file's shape is fixed, so each flow adds a line, not structure. Tunnel addresses in this file
+duplicate `peers.toml`; that is accepted for this spec, and a hub test asserts every address in
+`rules.v4` is an address in `peers.toml`. Generating the rules from the table is a TODO (section
+15). The `INPUT`
 chain is not touched: Docker publishes the UDP port and the container's default `INPUT` policy
 accepts.
 
@@ -415,10 +435,16 @@ template), so a broken table is caught before a release is attempted.
 
 A spoke logs its derived public key at every start and, when the hub's bundle lacks it, refuses
 to start with `not enrolled` and that key (5.2). Enrolment is: take the key from that log, add a
-`[[peers]]` row with it and the next address from the plan, add the flow to `rules.v4` if the peer
-may reach the database (next phase, 3.3), release the hub, redeploy the spoke. A running, enrolled
+`[[peers]]` row with it and the next address from the plan, add a line to `rules.v4` for each flow
+the peer may open to another peer (3.3), release the hub, redeploy the spoke. A running, enrolled
 spoke picks up a later change to its row within the version poll interval (5.5) without a
 redeploy.
+
+A Windows spoke has no such log line before it is installed, so the maintainer generates its key
+pair at enrolment and the private key reaches the PC through that spoke's installer (10.2); this
+is how `office-db-pc` and `cffs-pc` were enrolled. A container spoke can be enrolled ahead the
+same way, from a key that is not yet deployed, so its first start is not refused; `tunnel-probe`
+and ScheduledReportAggregator were enrolled so.
 
 ## 4. The bundle contract
 
@@ -904,7 +930,10 @@ every image), so the release order of 14 is what keeps the two in step.
 
 ## 10. Consuming projects
 
-### 10.1 ScheduledReportAggregator and `tunnel-probe` (spokes)
+### 10.1 Container spokes
+
+ScheduledReportAggregator (`10.8.0.20`), `tunnel-probe` (`10.8.0.21`) and camera-footage-fs
+(`10.8.0.23`). Each migrates or starts like this:
 
 - `pyproject.toml`: unchanged, `wireguard = true`.
 - Run `setup-project` after this repo's release. Then, by hand, remove the ten old `WG_*` lines
@@ -919,32 +948,84 @@ every image), so the release order of 14 is what keeps the two in step.
   the env-keys rule keeps a present key's value; edit it by hand to match.
 - Enrol: the first start is refused with `not enrolled` and logs the public key; add the row to
   the hub's `peers.toml` (3.8), release the hub, redeploy the spoke.
-- Neither adopts consent in this change: the app-side helper is deferred (6.4), and
-  non-participation reads as consent.
-- `tunnel-probe` is a one-shot sandbox (owner ruling, 2026-09-15): its app is a placeholder that
+- None adopts consent: the app-side helper is deferred (6.4), and non-participation reads as
+  consent.
+
+Per spoke:
+
+- **ScheduledReportAggregator** was migrated in its 3.1.0 (2026-09-15). Its migration, its
+  environment and its checks are its own `docs/office-database-access.md` (10.4).
+- **`tunnel-probe`** is a one-shot sandbox (owner ruling, 2026-09-15): its app is a placeholder that
   prints one line and exits 0, replaced by hand with whatever smoke test the owner wants run over
   the tunnel from inside Coolify. It uses neither `aeth_ext` nor healthchecks.io; the rendered
   heartbeat and healthcheck lines stay as the template emits them and are ignored, and Coolify
   reporting the exited container as unhealthy is accepted. `restart: no` makes each deploy one
   run. Its key pair was generated at enrolment and its row added to the hub before its first
   deploy, so its first start is not refused. Its database query, which exercises the Python
-  connection-and-query workflow over the tunnel outside production, is the next phase's
-  (section 11), as is its database client.
+  connection-and-query workflow over the tunnel outside production, is the next phase's, as is
+  its database client (10.4).
+- **camera-footage-fs** is the public ingress of 10.3.
 
-### 10.2 The office PC
+### 10.2 Windows spokes
 
-Not a container. Download `office-db-pc.conf` from the hub's release assets, replace the private
-key placeholder with the PC's own key, install with WireGuard for Windows. Re-download after any
-hub release that changes the `[hub]` section. Its firewall rule for the database port is the next
-phase's (section 11).
+Not containers. WireGuard for Windows runs the tunnel as the Windows service
+`WireGuardTunnel$<peer>`, which starts at boot before anyone logs in, from the `<peer>.conf` the
+hub's release renders (3.7) with the private key filled in. A Windows spoke needs only outbound UDP
+to the hub; no port forward. Windows classes the tunnel interface as a Public network, so a
+firewall rule meant for tunnel traffic covers all profiles or names the interface.
 
-Owner's ruling, 2026-09-15, after comparing this against a PC-side health agent (Python task or
-Rust service), hub-side peer probes, and a Linux node on the office LAN: this section stands as
-the first step. The comparison, the costs, the ruling and the install procedure are
-ScheduledReportAggregator's `docs/superpowers/specs/2026-09-15-office-db-pc-peer-design.md`. The
-upgrade path is a scheduled-task script on the PC that re-imports the conf asset when the hub's
-tag changes, then hub-side probes of every peer, then a PC-side agent for MSSQL health; each step
-gets its ruling here before it is built.
+`wireguard-spoke-agent` (`AetherBreaker/wireguard-spoke-agent`, published on SFTPyPI) keeps the
+tunnel current and running; its README and its module docstring are its reference. In outline:
+
+- It is a `uv tool` install under `C:\ProgramData\wireguard-spoke-agent\`, a folder only SYSTEM and
+  Administrators can read. The folder holds `settings.env` (`WG_PEER_NAME`, and optionally the
+  healthchecks.io and Pushover values), `<peer>.key`, the filled `<peer>.conf`, its state and its
+  logs.
+- A scheduled task runs it as SYSTEM at boot and every 5 minutes, through a `run.cmd` that upgrades
+  the agent first.
+- Each run reads the hub's `/version` (4.1). On a new tag it downloads `<peer>.conf` from that
+  tag's release, fills in the key, and reinstalls the tunnel service only if the conf changed; a
+  release without the peer's conf raises one alert. It then makes sure the service exists and
+  runs, judges the handshake against 180 s (the container spokes' `WG_STALE_SECS` default), and,
+  when a ping key is set, pings healthchecks.io with success or fail. Last, it re-renders
+  `run.cmd` and its scheduled task when its templates changed.
+- Pushover is only for an exception the agent did not catch; healthchecks.io alerts on its own.
+
+Where it differs from a container spoke: it fetches the peer's `.conf` asset, not the bundle, and
+names its peer in `settings.env` rather than selecting by public key; it fetches without a token,
+so it works only while the hub repository is public (2); and it builds the download URL from the
+version string without first validating it as a strict tag, which section 2 requires of spokes
+(raised 2026-10-14; open).
+
+The agent ships no installer (owner, 2026-10-05). Each Windows spoke's installer is its own:
+
+- `cffs-pc` (`10.8.0.22`): camera-footage-fs's `Install-CffsPc.ps1` (10.3); a fresh handshake
+  confirmed 2026-10-06.
+- `office-db-pc` (`10.8.0.10`): in design; see ScheduledReportAggregator's document (10.4).
+
+### 10.3 Public ingress spokes
+
+camera-footage-fs (`10.8.0.23`) is a container spoke whose app is a proxy: the public face, at
+`cffs.sweetfiretobacco.com`, of the SFTPGo server on `cffs-pc` (a Windows spoke, 10.2). SFTP on
+TCP 2022 is published by its compose file; the web client is a Coolify domain through Traefik. The
+hub forwards only `10.8.0.23` to `10.8.0.22` on TCP 2022 and 8090 (3.3), and the firewall rules
+`Install-CffsPc.ps1` writes on `cffs-pc` admit those ports from `10.8.0.23`. It is an ordinary
+spoke (2).
+
+It reads `cffs-pc`'s tunnel address from the supervisor's bundle cache,
+`persisted_data/wireguard/peers.toml` (4.4), so that file's path and format are now read by an app
+as well as by the supervisor. Everything else about it, and about `cffs-pc`, is in camera-footage-fs's
+README.
+
+### 10.4 The office database
+
+`office-db-pc` (`10.8.0.10`) is the office PC that runs MSSQL. It is a Windows spoke (10.2) and has
+not been installed yet. ScheduledReportAggregator's `docs/office-database-access.md` holds
+everything specific to it and to the database flows: the PC, the comparison of 2026-09-15 and its
+ruling, the upgrade path, the open decisions (port, login, driver, the approved flows and their
+`rules.v4` lines, the PC's firewall rule), and the checks moved out of section 16. Of the upgrade
+path, the hub-side step, every peer probed by the hub (which reverses 3.5), gets its ruling in
+this document before it is built; the PC-side steps get theirs in ScheduledReportAggregator's.
 
 ## 11. Decisions the owner delegated, and decisions reserved for the owner
 
@@ -959,17 +1040,18 @@ Delegated to this document and decided here:
 - The Dockerfile windows are named `builder` and `final`, marked `# !window <name>:` and
   `# !end <name>` (9.3).
 - Tunnel subnet `10.8.0.0/24`. Addresses: hub `10.8.0.1/24`; office database PC `10.8.0.10/32`;
-  ScheduledReportAggregator `10.8.0.20/32`; `tunnel-probe` `10.8.0.21/32`. Further peers from
-  `.22` upward. The first-deploy check confirms neither the office LAN nor the VPS uses this
-  network.
+  ScheduledReportAggregator `10.8.0.20/32`; `tunnel-probe` `10.8.0.21/32`; `cffs-pc`, the SFTPGo
+  PC, `10.8.0.22/32`; camera-footage-fs `10.8.0.23/32` (the last two enrolled in hub 1.5.1,
+  2026-10-05). Further peers from `.24` upward. The first-deploy check confirms neither the office
+  LAN nor the VPS uses this network.
 - UDP port 51820. Public name `tunnels.sweetfiretobacco.com` (the owner's choice, recorded).
 
 Reserved for the owner and answered in the grounding pass of 2026-09-14:
 
 - **The database engine, port and protocol for `rules.v4`, and where it listens:** deferred to the
-  next phase, after this document is implemented. `rules.v4` ships with the policy only (3.3);
-  the per-flow rules, the office PC's firewall rule (10.2), `tunnel-probe`'s query (10.1) and the
-  three checks of section 16 that need the database follow with that decision.
+  next phase, after this document is implemented. The engine is MSSQL (owner, 2026-10-14). The
+  rest of the decision, the database's per-flow rules, the office PC's firewall rule,
+  `tunnel-probe`'s query and the three database checks are ScheduledReportAggregator's (10.4).
 - **The test project's name:** delegated to this document, `tunnel-probe` (above).
 - **The production token:** not created while the hub repository is public (owner ruling,
   2026-09-15; 10.1 makes the compose line optional). When the repository goes private: a
@@ -985,8 +1067,6 @@ Reserved for the owner and answered in the grounding pass of 2026-09-14:
   scanning knows, and each constant's line carries the `gitleaks:allow`, `trufflehog:ignore` and
   `ggignore` markers with a comment that it guards nothing. The token is read from
   `DEVKIT_SMOKE_WG_HUB_TOKEN`; CI holds it as a secret under the same name.
-- **Whether ScheduledReportAggregator adopts consent in the same change as its migration:** later,
-  with the `aeth_ext` helper (6.4).
 - **Whether `wireguard-hub` runs with `supervise = true`:** no; 3.6 stands. A crashed hub exits
   its container, its pings stop and healthchecks.io alerts; `supervise` would add only an
   immediate `/fail` and oblige the hub's heartbeat loop to know about the supervisor owning the
@@ -1005,7 +1085,8 @@ Constraints, all the owner's:
 - In-house end to end: no third-party overlay or tunnel service in the data path.
 - Every real user of the network has its own key pair and tunnel address, so activity is
   attributable; no shared forwarder between apps.
-- The database must not be reachable by any other container on the `coolify` network.
+- The database's own constraints, among them that no other container on the `coolify` network may
+  reach it, are ScheduledReportAggregator's (10.4).
 - Coolify conventions hold: auto-deploy on changes under `docker/**`, consistent container names,
   every container on the external `coolify` network so `central-log-server` resolves.
 - healthchecks.io and Pushover for every new component, preferred not required.
@@ -1018,23 +1099,22 @@ Topology and security:
   userspace WireGuard forwarder.
 - **Hub and spoke.** Every spoke talks only to the hub; spokes on the VPS use the hub's public
   endpoint too, through Docker's hairpin path, with the per-peer `endpoint` override of 3.2 as the
-  fallback. No DNS inside the tunnel: the database host is reached by its tunnel address.
-- **Spokes get `cap_add: [NET_ADMIN]` and nothing else**, no `devices` and no `sysctls` (9.2); the
-  hub alone adds the forwarding sysctl and the published port, by hand (3.6).
-- **Security layers.** The hub's cryptokey routing and its `FORWARD` rules (3.3); the office PC's
-  firewall allowing the database port only from approved tunnel addresses (next phase, 10.2); a
-  read-only database account for the app; private keys only in Coolify secrets or the gitignored
-  local `.env`.
-- **The office PC** runs native WireGuard for Windows as a service, not Docker Desktop under WSL2,
-  so the tunnel is up before anyone logs in and the database port is directly reachable at the
-  PC's tunnel address. It needs only outbound UDP to the hub; no router port forward.
+  fallback. No DNS inside the tunnel: every peer is reached by its tunnel address.
+- **Container spokes get `cap_add: [NET_ADMIN]` and nothing else**, no `devices` and no `sysctls`
+  (9.2); the hub alone adds the forwarding sysctl and the published port, by hand (3.6).
+- **Security layers.** The hub's cryptokey routing and its `FORWARD` rules (3.3); each destination
+  peer's own firewall admitting its ports only from approved tunnel addresses (`cffs-pc` 10.3, the
+  office PC 10.4); private keys only in Coolify secrets, gitignored local files, and on a Windows
+  spoke the agent's locked folder (10.2).
+- **Windows spokes** run native WireGuard for Windows as a service (10.2), not Docker Desktop
+  under WSL2, so the tunnel is up before anyone logs in and the PC's own services are directly
+  reachable at its tunnel address. They need only outbound UDP to the hub; no router port forward.
 
 The cleanup list, artefacts of an earlier attempt that are removed and never read as inputs: the
 workspace folders `wireguard-test-sender`, `wireguard-vps-relay` and `wireguard-warehouse-client`;
-the workspace-root `compose.test.yaml`; ScheduledReportAggregator's gitignored
-`docker/wireguard/keys.env`; and the `SERVER_PUBLIC_KEY`, `SERVER_ENDPOINT` and
-`TAXES_JOB_PRIVATE_KEY` entries in its `.env`. Key pairs from that attempt are retired, never
-reused.
+the workspace-root `compose.test.yaml`; and ScheduledReportAggregator's own items, tracked in its
+document (10.4). Key pairs from that attempt are retired, never reused. Status, 2026-10-14: the
+three folders are gone; `compose.test.yaml` is still present.
 
 ## 13. Tests
 
@@ -1113,7 +1193,8 @@ to stdin; the `/version` response; the heartbeat gating on the interface path an
    job, the compose additions and the window content written by hand (3.6); first release with
    the owner's peer rows; deployed in Coolify with the domain attached.
 - [ ] 4. Spokes re-rendered and migrated per 10.1, `tunnel-probe` created the same way as the hub; the
-   office PC per 10.2.
+   office PC per 10.2 (its install is tracked in ScheduledReportAggregator's document since
+   2026-10-14, 10.4).
 - [ ] 5. The first-deploy checklist of section 16, in order.
 
 The boxes above and in section 16 are ticked as each step lands (owner's instruction, 2026-09-15);
@@ -1147,6 +1228,17 @@ devkit-container 2.1.1 without a new release, since 2.1.1 changed only the templ
 compose line already matched. Left in step 4: the hub redeployed at v1.2.0, both spokes deployed
 with the three variables (ScheduledReportAggregator's Coolify environment loses the nine old
 values and its `WG_PRIVATE_KEY` must be the key whose public key is enrolled), and the office PC.
+
+Status, 2026-10-14: wireguard-hub 1.5.1 is deployed (`/version` answers `v1.5.1`). 1.5.0
+(2026-09-15) enrolled `office-db-pc`; 1.5.1 (2026-10-05) enrolled `cffs-pc` and camera-footage-fs
+and added the first per-flow line (3.3, 10.3). Both are working: `cffs-pc` runs
+wireguard-spoke-agent 0.1.1, installed by camera-footage-fs's `Install-CffsPc.ps1`, with a fresh
+handshake on 2026-10-06; camera-footage-fs 1.0.0 is deployed, reached `cffs-pc` over the tunnel on
+2026-10-06, and served SFTP publicly on 2026-10-07, which also exercised the hairpin of 16 from a
+VPS-side spoke. The office PC has not been installed; its installer is in design (10.4). No
+session records the Coolify deploys of ScheduledReportAggregator and `tunnel-probe` on their
+migrated compose files, so step 4 stays open. The same day this document was restructured
+(header) and became the only copy.
 
 ## 15. TODO entries to record in this repo at implementation
 
@@ -1182,16 +1274,12 @@ First deploy, in this order, each a hard stop if it fails:
 - [x] 3. The hub deploys; `docker inspect` on its container shows `NET_ADMIN`, the forwarding sysctl and
    the published UDP port passed through unchanged; `GET /version` over the public name answers
    the hub's tag; the hub's heartbeat is fresh.
-- [ ] 4. The hub and the office PC handshake with each other before any app is involved.
-- [ ] 5. ScheduledReportAggregator's first start is refused with `not enrolled` and its key in the log;
-   enrolled and redeployed, it fetches the bundle, handshakes with the hub at the public endpoint
-   (the hairpin check, with the firewall rules above), and both of its heartbeat files are fresh;
-   `docker inspect` shows `cap_add` passed through.
+- (4) Moved to ScheduledReportAggregator's document, section 8 (10.4): the hub and the office PC
+   handshake with each other before any app is involved.
+- (5) Moved to ScheduledReportAggregator's document, section 8 (10.4): its first fetched-mode
+   start, handshake through the hairpin, and fresh heartbeat files.
 - [ ] 6. A hub release that changes nothing for the spoke is picked up within the version poll interval
    with no re-apply logged; one that changes its keepalive is applied in place without the
    interface going down.
 
-The next phase's checks, once the database decision of section 11 is made: `tunnel-probe` runs
-its query against the database over the tunnel; a sibling container on the `coolify` network
-cannot reach the database port (negative test); the office PC's firewall rejects the database
-port from a tunnel address that is not approved.
+The next phase's checks, which need the database, are ScheduledReportAggregator's (10.4).
