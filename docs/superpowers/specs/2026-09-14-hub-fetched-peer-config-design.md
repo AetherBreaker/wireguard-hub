@@ -1042,8 +1042,8 @@ Delegated to this document and decided here:
 - Tunnel subnet `10.8.0.0/24`. Addresses: hub `10.8.0.1/24`; office database PC `10.8.0.10/32`;
   ScheduledReportAggregator `10.8.0.20/32`; `tunnel-probe` `10.8.0.21/32`; `cffs-pc`, the SFTPGo
   PC, `10.8.0.22/32`; camera-footage-fs `10.8.0.23/32` (the last two enrolled in hub 1.5.1,
-  2026-10-05). Further peers from `.24` upward. The first-deploy check confirms neither the office
-  LAN nor the VPS uses this network.
+  2026-10-05). Further peers from `.24` upward. The first-deploy check confirms neither the VPS nor
+  any network a Windows spoke sits on uses this network (16 step 1).
 - UDP port 51820. Public name `tunnels.sweetfiretobacco.com` (the owner's choice, recorded).
 
 Reserved for the owner and answered in the grounding pass of 2026-09-14:
@@ -1198,7 +1198,8 @@ to stdin; the `/version` response; the heartbeat gating on the interface path an
 - [ ] 5. The first-deploy checklist of section 16, in order.
 
 The boxes above and in section 16 are ticked as each step lands (owner's instruction, 2026-09-15);
-section 16 step 1 waits for the owner's word that the subnet is unused.
+section 16 step 1 waits for the owner's word that the subnet is unused (given 2026-10-14, in the
+parts that step records).
 
 Status, 2026-09-15: steps 1 to 3 are done and deployed: aeth-devkit 15.1.1 (15.1.0 the features,
 15.1.1 the `docker-pin` window fix), devkit-templates 1.3.0, devkit-container 2.1.0, wireguard-hub
@@ -1270,7 +1271,11 @@ cannot be fixed this way.
 
 First deploy, in this order, each a hard stop if it fails:
 
-- [ ] 1. Neither the office LAN nor the VPS uses `10.8.0.0/24`.
+- [ ] 1. Neither the VPS nor any network a Windows spoke sits on uses `10.8.0.0/24`. Settled by the
+   owner on 2026-10-14, in parts: the VPS holds, shown by working traffic on every VPS-side spoke;
+   `cffs-pc`'s network holds, shown by its tunnel working since 2026-10-06; the database PC's
+   warehouse network is checked by that PC's installer on its first run, which stops if an
+   adapter already holds a `10.8.0.x` address (10.4). The box is ticked when that run passes.
 - [x] 2. `modprobe wireguard` succeeds on the VPS host, and the netfilter modules above are present.
 - [x] 3. The hub deploys; `docker inspect` on its container shows `NET_ADMIN`, the forwarding sysctl and
    the published UDP port passed through unchanged; `GET /version` over the public name answers
