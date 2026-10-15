@@ -1002,7 +1002,8 @@ The agent ships no installer (owner, 2026-10-05). Each Windows spoke's installer
 
 - `cffs-pc` (`10.8.0.22`): camera-footage-fs's `Install-CffsPc.ps1` (10.3); a fresh handshake
   confirmed 2026-10-06.
-- `office-db-pc` (`10.8.0.10`): in design; see ScheduledReportAggregator's document (10.4).
+- `office-db-pc` (`10.8.0.10`): ScheduledReportAggregator's `Install-OfficeDbPc.ps1` (10.4); not
+  run on the PC yet.
 
 ### 10.3 Public ingress spokes
 
