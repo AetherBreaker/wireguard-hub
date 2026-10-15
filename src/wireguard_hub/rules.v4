@@ -1,8 +1,7 @@
-# The filter table, applied whole by wireguard-hub-up (hub design 3.3). Policy only: forwarding
-# is dropped unless a flow is listed here; replies to a permitted flow are accepted. Per-flow
-# ACCEPT lines (a spoke's /32 to the database PC's /32 on the database port) are the next
-# phase's, once the engine, port and protocol are decided. INPUT is not touched: Docker
-# publishes the UDP port and the container's default INPUT policy accepts.
+# The filter table, applied whole by wireguard-hub-up (hub design 3.3). Forwarding is dropped
+# unless a flow is listed here; replies to a permitted flow are accepted. One ACCEPT line per flow,
+# a spoke's /32 to a peer's /32 on named ports. INPUT is not touched: Docker publishes the UDP port
+# and the container's default INPUT policy accepts.
 *filter
 :INPUT ACCEPT [0:0]
 :FORWARD DROP [0:0]
@@ -10,4 +9,6 @@
 -A FORWARD -i wg0 -o wg0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 # camera-footage-fs (public ingress) to cffs-pc's SFTPGo: SFTP and the web client only.
 -A FORWARD -i wg0 -o wg0 -s 10.8.0.23/32 -d 10.8.0.22/32 -p tcp -m multiport --dports 2022,8090 -m conntrack --ctstate NEW -j ACCEPT
+# tunnel-probe to office-db-pc's MSSQL (ScheduledReportAggregator's docs/office-database-access.md, 7).
+-A FORWARD -i wg0 -o wg0 -s 10.8.0.21/32 -d 10.8.0.10/32 -p tcp --dport 1433 -m conntrack --ctstate NEW -j ACCEPT
 COMMIT
