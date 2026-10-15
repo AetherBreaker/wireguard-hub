@@ -993,9 +993,10 @@ tunnel current and running; its README and its module docstring are its referenc
 
 Where it differs from a container spoke: it fetches the peer's `.conf` asset, not the bundle, and
 names its peer in `settings.env` rather than selecting by public key; it fetches without a token,
-so it works only while the hub repository is public (2); and it builds the download URL from the
-version string without first validating it as a strict tag, which section 2 requires of spokes
-(raised 2026-10-14; open).
+so it works only while the hub repository is public (2); and it accepts the version string as "v"
+plus any version uv accepts (PEP 440), wider than the container spokes' `v<int>.<int>.<int>` of
+4.1, so that a dev or pre-release hub stays reachable (owner, 2026-10-14; devkit-container's TODO
+widens 4.1 to match). Before 0.1.2 (2026-10-15) it validated nothing, against section 2.
 
 The agent ships no installer (owner, 2026-10-05). Each Windows spoke's installer is its own:
 
