@@ -1272,11 +1272,10 @@ cannot be fixed this way.
 
 First deploy, in this order, each a hard stop if it fails:
 
-- [ ] 1. Neither the VPS nor any network a Windows spoke sits on uses `10.8.0.0/24`. Settled by the
-   owner on 2026-10-14, in parts: the VPS holds, shown by working traffic on every VPS-side spoke;
-   `cffs-pc`'s network holds, shown by its tunnel working since 2026-10-06; the database PC's
-   warehouse network is checked by that PC's installer on its first run, which stops if an
-   adapter already holds a `10.8.0.x` address (10.4). The box is ticked when that run passes.
+- [x] 1. Neither the VPS nor any network a Windows spoke sits on uses `10.8.0.0/24`. Settled by the
+   owner in parts: the VPS holds, shown by working traffic on every VPS-side spoke; `cffs-pc`'s
+   network holds, shown by its tunnel working since 2026-10-06; the database PC's warehouse
+   network holds, checked once by hand on that PC on 2026-10-15 (10.4).
 - [x] 2. `modprobe wireguard` succeeds on the VPS host, and the netfilter modules above are present.
 - [x] 3. The hub deploys; `docker inspect` on its container shows `NET_ADMIN`, the forwarding sysctl and
    the published UDP port passed through unchanged; `GET /version` over the public name answers
