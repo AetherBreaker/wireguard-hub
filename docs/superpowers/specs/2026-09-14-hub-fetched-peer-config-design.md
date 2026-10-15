@@ -1002,8 +1002,8 @@ The agent ships no installer (owner, 2026-10-05). Each Windows spoke's installer
 
 - `cffs-pc` (`10.8.0.22`): camera-footage-fs's `Install-CffsPc.ps1` (10.3); a fresh handshake
   confirmed 2026-10-06.
-- `office-db-pc` (`10.8.0.10`): ScheduledReportAggregator's `Install-OfficeDbPc.ps1` (10.4); not
-  run on the PC yet.
+- `office-db-pc` (`10.8.0.10`): ScheduledReportAggregator's `Install-OfficeDbPc.ps1` (10.4); run
+  on the PC on 2026-10-15.
 
 ### 10.3 Public ingress spokes
 
@@ -1021,8 +1021,8 @@ README.
 
 ### 10.4 The office database
 
-`office-db-pc` (`10.8.0.10`) is the office PC that runs MSSQL. It is a Windows spoke (10.2) and has
-not been installed yet. ScheduledReportAggregator's `docs/office-database-access.md` holds
+`office-db-pc` (`10.8.0.10`) is the office PC that runs MSSQL. It is a Windows spoke (10.2), installed
+on 2026-10-15. ScheduledReportAggregator's `docs/office-database-access.md` holds
 everything specific to it and to the database flows: the PC, the comparison of 2026-09-15 and its
 ruling, the upgrade path, the open decisions (port, login, driver, the approved flows and their
 `rules.v4` lines, the PC's firewall rule), and the checks moved out of section 16. Of the upgrade
@@ -1194,7 +1194,7 @@ to stdin; the `/version` response; the heartbeat gating on the interface path an
    `pyproject.toml`, then `setup-project` against the releases from steps 1 and 2, the `peers`
    job, the compose additions and the window content written by hand (3.6); first release with
    the owner's peer rows; deployed in Coolify with the domain attached.
-- [ ] 4. Spokes re-rendered and migrated per 10.1, `tunnel-probe` created the same way as the hub; the
+- [x] 4. Spokes re-rendered and migrated per 10.1, `tunnel-probe` created the same way as the hub; the
    office PC per 10.2 (its install is tracked in ScheduledReportAggregator's document since
    2026-10-14, 10.4).
 - [ ] 5. The first-deploy checklist of section 16, in order.
@@ -1243,6 +1243,12 @@ there are what runs: ScheduledReportAggregator in fetched mode at v3.1.2 since 2
 `tunnel-probe` at v1.0.0, deployed by the owner and exited by design (10.1). The office PC has not
 been installed; its installer is in design (10.4). It is all that is left in step 4. The same day
 this document was restructured (header) and became the only copy.
+
+Status, 2026-10-15: the office PC was installed with ScheduledReportAggregator's
+`Install-OfficeDbPc.ps1` and handshakes with the hub, including after a reboot with no one logged
+in; step 4 is done. Checks 4 and 5 of section 16, kept in ScheduledReportAggregator's document,
+hold. The database itself (its port, login, flows and their `rules.v4` lines) is the next phase,
+in that document's section 7.
 
 ## 15. TODO entries to record in this repo at implementation
 
