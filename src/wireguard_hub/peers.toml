@@ -11,8 +11,9 @@ persistent_keepalive = 25                      # default for every peer
 
 # One [[peers]] row per enrolled spoke (hub design 3.2, 3.8). Addresses: office database PC
 # 10.8.0.10/32, ScheduledReportAggregator 10.8.0.20/32, tunnel-probe 10.8.0.21/32, SFTPGo PC
-# 10.8.0.22/32, camera-footage-fs ingress 10.8.0.23/32, further peers from .24 (section 11). Optional per-row overrides, each with the meaning of the [hub]
-# default it replaces: endpoint, allowed_ips, persistent_keepalive.
+# 10.8.0.22/32, camera-footage-fs ingress 10.8.0.23/32, timeclock-backend 10.8.0.24/32, central log server
+# 10.8.0.25/32, timeclock-dev 10.8.0.26/32, further peers from .27 (section 11). Optional per-row overrides, each with the
+# meaning of the [hub] default it replaces: endpoint, allowed_ips, persistent_keepalive.
 
 [[peers]]
 name = "tunnel-probe"
@@ -38,3 +39,18 @@ address = "10.8.0.22/32"
 name = "camera-footage-fs"
 public_key = "9Ks4w2gApb2amCxjAatyapvIFsX6CWgLcvNA6v1+rmc="
 address = "10.8.0.23/32"
+
+[[peers]]
+name = "timeclock-backend"
+public_key = "AP6ufrXmIIzDSB6/uMW2G6gCUZHeUfgEaM2AQY6jeCE="
+address = "10.8.0.24/32"
+
+[[peers]]
+name = "central-log-server"
+public_key = "15xLraMj3BB2zxE/NZ+AHNGq54lkfZ8jlgNPivgOYEI="
+address = "10.8.0.25/32"
+
+[[peers]]
+name = "timeclock-system-dev"
+public_key = "rO18gjtsHvXyfGxCuWfpRWB2Crtfs2KR8HCSUsnLGXI="
+address = "10.8.0.26/32"
