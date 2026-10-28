@@ -7,7 +7,7 @@ The WireGuard hub of the tunnel. `docs/superpowers/specs/2026-09-14-hub-fetched-
 
 ## The peer table
 
-`peers.toml` is the single hand-edited source: the `[hub]` section and one `[[peers]]` row per enrolled spoke (name, public key, `/32` address; optional `endpoint`, `allowed_ips`, `persistent_keepalive` overrides). Addresses: subnet `10.8.0.0/24`, hub `10.8.0.1`, office database PC `10.8.0.10`, ScheduledReportAggregator `10.8.0.20`, `tunnel-probe` `10.8.0.21`, `cffs-pc` `10.8.0.22`, camera-footage-fs `10.8.0.23`, `timeclock-backend` `10.8.0.24`, the central log server `10.8.0.25`, timeclock-dev `10.8.0.26`, `timeclock-system-main-office-timeclock` `10.8.0.27`, further peers from `.28`. Every rule of the table is checked by the startup script, by `python -m wireguard_hub.bundle`, and by the tests (`uv run pytest`); a failure names the field.
+`peers.toml` is the single hand-edited source: the `[hub]` section and one `[[peers]]` row per enrolled spoke (name, public key, `/32` address; optional `endpoint`, `allowed_ips`, `persistent_keepalive` overrides). Addresses: subnet `10.8.0.0/24`, hub `10.8.0.1`, office database PC `10.8.0.10`, ScheduledReportAggregator `10.8.0.20`, `tunnel-probe` `10.8.0.21`, `cffs-pc` `10.8.0.22`, camera-footage-fs `10.8.0.23`, `timeclock-backend` `10.8.0.24`, the central log server `10.8.0.25`, timeclock-dev `10.8.0.26`, `timeclock-system-main-office` `10.8.0.27`, further peers from `.28`. Every rule of the table is checked by the startup script, by `python -m wireguard_hub.bundle`, and by the tests (`uv run pytest`); a failure names the field.
 
 ## Releases
 

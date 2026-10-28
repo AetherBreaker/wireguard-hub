@@ -15,8 +15,8 @@
 -A FORWARD -i wg0 -o wg0 -s 10.8.0.26/32 -d 10.8.0.25/32 -p tcp --dport 9020 -m conntrack --ctstate NEW -j ACCEPT
 # timeclock-dev to timeclock-backend's database relay (timeclock design 12, R26.1).
 -A FORWARD -i wg0 -o wg0 -s 10.8.0.26/32 -d 10.8.0.24/32 -p tcp --dport 5432 -m conntrack --ctstate NEW -j ACCEPT
-# timeclock-system-main-office-timeclock to the central log server (timeclock design 12, R22).
+# timeclock-system-main-office to the central log server (timeclock design 12, R22).
 -A FORWARD -i wg0 -o wg0 -s 10.8.0.27/32 -d 10.8.0.25/32 -p tcp --dport 9020 -m conntrack --ctstate NEW -j ACCEPT
-# timeclock-system-main-office-timeclock to timeclock-backend's database relay (timeclock design 12, R26.1).
+# timeclock-system-main-office to timeclock-backend's database relay (timeclock design 12, R26.1).
 -A FORWARD -i wg0 -o wg0 -s 10.8.0.27/32 -d 10.8.0.24/32 -p tcp --dport 5432 -m conntrack --ctstate NEW -j ACCEPT
 COMMIT
